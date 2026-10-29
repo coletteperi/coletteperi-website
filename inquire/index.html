@@ -39,10 +39,9 @@
 
 <section class="section" style="padding-top:24px;">
   <div class="wrap">
-    <form class="form" action="https://formsubmit.co/73037e451ef7197d768052903e81461f" method="POST" onsubmit="try{sessionStorage.setItem('inq_em',document.getElementById('email').value)}catch(e){}">
-      <input type="hidden" name="_next" value="https://www.coletteperi.com/thank-you/" />
+    <form class="form" id="inquiryForm" action="https://formspree.io/f/FORMSPREE_ID" method="POST">
       <input type="hidden" name="_subject" value="New inquiry from coletteperi.com" />
-      <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <div class="field"><label for="name">Name</label><input id="name" name="name" type="text" required /></div>
       <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required /></div>
       <div class="field"><label for="company">Brand / Company</label><input id="company" name="company" type="text" required /></div>
@@ -69,6 +68,7 @@
       </div>
       <div class="field"><label for="message">Tell us about it</label><textarea id="message" name="message" required></textarea></div>
       <button type="submit" class="btn btn-yellow">Send Inquiry</button>
+      <p class="form-status" role="status" aria-live="polite" style="text-align:center;margin-top:16px;"></p>
     </form>
     <p style="text-align:center;margin-top:30px;color:var(--ink-soft);">Find Colette on Instagram at <a href="https://www.instagram.com/colette.peri" target="_blank" rel="noopener" style="color:var(--red-orange);text-decoration:underline;">@colette.peri</a></p>
   </div>
@@ -83,6 +83,33 @@
     <div class="footer-bottom">© 2026 Colette Peri · Sausalito, CA</div>
   </div>
 </footer>
+<script>
+// Send the inquiry to Formspree in the background, then go to our own thank-you page.
+// Without JS the form still posts normally and Formspree shows its own confirmation.
+(function () {
+  var form = document.getElementById('inquiryForm');
+  if (!form || !window.fetch) return;
+  var btn = form.querySelector('button[type="submit"]');
+  var status = form.querySelector('.form-status');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    try { sessionStorage.setItem('inq_em', document.getElementById('email').value); } catch (err) {}
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    status.textContent = '';
+    fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Formspree ' + res.status);
+        window.location.href = '/thank-you/';
+      })
+      .catch(function () {
+        btn.disabled = false;
+        btn.textContent = 'Send Inquiry';
+        status.textContent = 'Sorry, something went wrong sending your inquiry. Please try again, or message Colette on Instagram.';
+      });
+  });
+})();
+</script>
 <script src="/main.js?v=28"></script>
 </body>
 </html>
