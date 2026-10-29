@@ -105,7 +105,7 @@
       .catch(function () {
         btn.disabled = false;
         btn.textContent = 'Send Inquiry';
-        status.textContent = 'Sorry, something went wrong sending your inquiry. Please try again, or message Colette on Instagram.';
+        status.innerHTML = 'Sorry, something went wrong sending your inquiry. Please try again, or email us at <a href="mailto:hello@coletteperi.com" style="color:var(--red-orange);text-decoration:underline;">hello@coletteperi.com</a>.';
       });
   });
 })();
