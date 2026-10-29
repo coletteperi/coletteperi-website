@@ -39,10 +39,12 @@
 
 <section class="section" style="padding-top:24px;">
   <div class="wrap">
-    <form class="form" action="https://formsubmit.co/73037e451ef7197d768052903e81461f" method="POST" onsubmit="try{sessionStorage.setItem('inq_em',document.getElementById('email').value)}catch(e){}">
-      <input type="hidden" name="_next" value="https://www.coletteperi.com/thank-you/" />
-      <input type="hidden" name="_subject" value="New inquiry from coletteperi.com" />
-      <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
+    <form class="form" id="inquiryForm" action="https://api.web3forms.com/submit" method="POST">
+      <input type="hidden" name="access_key" value="87280e9c-3085-404a-98d3-6a0f8f5f40a2" />
+      <input type="hidden" name="subject" value="New inquiry from coletteperi.com" />
+      <input type="hidden" name="from_name" value="coletteperi.com" />
+      <input type="hidden" name="redirect" value="https://www.coletteperi.com/thank-you/" />
+      <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <div class="field"><label for="name">Name</label><input id="name" name="name" type="text" required /></div>
       <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required /></div>
       <div class="field"><label for="company">Brand / Company</label><input id="company" name="company" type="text" required /></div>
@@ -69,6 +71,7 @@
       </div>
       <div class="field"><label for="message">Tell us about it</label><textarea id="message" name="message" required></textarea></div>
       <button type="submit" class="btn btn-yellow">Send Inquiry</button>
+      <p class="form-status" role="status" aria-live="polite" style="text-align:center;margin-top:16px;"></p>
     </form>
     <p style="text-align:center;margin-top:30px;color:var(--ink-soft);">Find Colette on Instagram at <a href="https://www.instagram.com/colette.peri" target="_blank" rel="noopener" style="color:var(--red-orange);text-decoration:underline;">@colette.peri</a></p>
   </div>
@@ -83,6 +86,34 @@
     <div class="footer-bottom">© 2026 Colette Peri · Sausalito, CA</div>
   </div>
 </footer>
+<script>
+// Send the inquiry to Web3Forms in the background, then go to our own thank-you page.
+// Without JS the form still posts normally and Web3Forms redirects to the thank-you page.
+(function () {
+  var form = document.getElementById('inquiryForm');
+  if (!form || !window.fetch) return;
+  var btn = form.querySelector('button[type="submit"]');
+  var status = form.querySelector('.form-status');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    try { sessionStorage.setItem('inq_em', document.getElementById('email').value); } catch (err) {}
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    status.textContent = '';
+    fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (!data.success) throw new Error(data.message || 'Web3Forms error');
+        window.location.href = '/thank-you/';
+      })
+      .catch(function () {
+        btn.disabled = false;
+        btn.textContent = 'Send Inquiry';
+        status.innerHTML = 'Sorry, something went wrong sending your inquiry. Please try again, or email us at <a href="mailto:hello@coletteperi.com" style="color:var(--red-orange);text-decoration:underline;">hello@coletteperi.com</a>.';
+      });
+  });
+})();
+</script>
 <script src="/main.js?v=28"></script>
 </body>
 </html>
